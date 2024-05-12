@@ -1,7 +1,18 @@
-# implement of "Inverse Discriminative Networks for Handwritten Signature Verification"
+# Inverse Discriminative Networks
 
-## dataset
+This is the non-official implement for IDN.
+The paper referenced is:
 
-<a href='http://www.cedar.buffalo.edu/NIJ/data/signatures.rar'>CEDAR</a>: English signature dataset
+> P. Wei, H. Li and P. Hu. Inverse Discriminative Networks for Handwritten Signature Verification. [CVPR 2019](https://openaccess.thecvf.com/content_CVPR_2019/papers/Wei_Inverse_Discriminative_Networks_for_Handwritten_Signature_Verification_CVPR_2019_paper.pdf)
 
-<a href='https://drive.google.com/file/d/0B29vNACcjvzVc1RfVkg5dUh2b1E'>BHSig260</a>: Bengali and Hindi signature dataset
+
+
+## Dataset
+
+[CEDAR](http://www.cedar.buffalo.edu/NIJ/data/signatures.rar): English signature dataset
+
+[BHSig260](https://drive.google.com/file/d/0B29vNACcjvzVc1RfVkg5dUh2b1E): Bengali and Hindi signature dataset
+
+[SigComp2011](http://www.iapr-tc11.org/mediawiki/index.php/ICDAR_2011_Signature_Verification_Competition_(SigComp2011)): ICDAR 2011 Signature Verification Competition dataset
+
+Download dataset in `./dataset` using `./dataset/download_dataset.py` by specifying the url provided above and run `./dataset/preprocess.py` to resize and prepare pairs for training.
