@@ -63,7 +63,7 @@ class stream(nn.Module):
 		return reference, inverse
 
 
-	def attention(self, inverse, discrimnative):
+	def attention(self, inverse, discriminative):
 		# Conv = nn.Sequential(
 		# 	nn.Conv2d(inverse.size()[1], inverse.size()[1], 3, stride=1, padding=1),
 		# 	nn.Sigmoid()
@@ -75,14 +75,14 @@ class stream(nn.Module):
 		# 	nn.Sigmoid()
 		# )
 
-		# print(inverse.size(), discrimnative.size())
-		up_sample = nn.functional.interpolate(inverse, (discrimnative.size()[2], discrimnative.size()[3]), mode='nearest')
+		# print(inverse.size(), discriminative.size())
+		up_sample = nn.functional.interpolate(inverse, (discriminative.size()[2], discriminative.size()[3]), mode='nearest')
 		# g = self.Conv(up_sample)
 		conv = getattr(self, 'Conv_' + str(up_sample.size()[1]), 'None')
 		g = conv(up_sample)
 		g = sigmoid(g)
-		# print(g.size(), discrimnative.size())
-		tmp = g * discrimnative + discrimnative
+		# print(g.size(), discriminative.size())
+		tmp = g * discriminative + discriminative
 		f = GAP(tmp)
 		f = f.view(f.size()[0], 1, f.size()[1])
 		

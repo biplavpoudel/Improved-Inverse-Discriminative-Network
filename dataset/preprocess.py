@@ -1,50 +1,64 @@
-import cv2
+from PIL import Image
 import os
-import numpy as np
+import pandas as pd
 import random
 
-
-# normalize each image by dividing the pixel values with the 
-# standard deviation of the pixel values of the images in a dataset
-
-# def resize_img(path):
-# 	# threshold = 220
-# 	try:
-# 		img = cv2.imread('CEDAR/full_forg/' + path, 0)
-# 		dst = cv2.resize(img, (220, 155), cv2.INTER_LINEAR)
-# 		cv2.imwrite('CEDAR/full_forg_gray_115x220/{}'.format(path), dst)
-# 	except:
-# 		print(path)
-
-# path = 'CEDAR/full_forg'
-# for p in os.listdir(path):
-# 	resize_img(p)
+size = 55
+num_genuine = 24
+num_forged = 24
 
 
-# img = cv2.imread('dataset/original_2_9.png', 0)
-# # img_ = cv2.resize(img, (img.shape[0]*2, img.shape[1]*2), cv2.INTER_NEAREST)
-# print(img.shape)
-# cv2.imshow('origin', img)
-# cv2.imshow('resize', 255 - img)
+def resize_img(root, w=220, h=115):
+    os.mkdir(f'{root}_resize')
+    for filename in os.listdir(root):
+        with Image.open(f'{root}/{filename}') as img:
+            img = img.resize((w, h))
+            img.save(f'{root}_resize/{filename}')
 
-# cv2.waitKey()
+
+def pair_string_genuine(i, j, k):
+    return f'full_org_resize/original_{i}_{j}.png full_org_resize/original_{i}_{k}.png 1\n'
 
 
-with open('CEDAR/gray_train.txt', 'w') as f:
-	for i in range(1, 51):
-		for j in range(1, 25):
-			for k in range(j+1, 25):
-				f.write('full_org_gray_115x220/original_{0}_{1}.png full_org_gray_115x220/original_{0}_{2}.png 1\n'.format(i, j, k))
-		org_forg = [(j,k) for j in range(1, 25) for k in range(1, 25)]
-		for (j, k) in random.choices(org_forg, k=276):
-			f.write('full_org_gray_115x220/original_{0}_{1}.png full_forg_gray_115x220/forgeries_{0}_{2}.png 0\n'.format(i, j, k))
+def pair_string_forged(i, j, k):
+    return f'full_org_resize/original_{i}_{j}.png full_forg_resize/forgeries_{i}_{k}.png 0\n'
 
-with open('CEDAR/gray_test.txt', 'w') as f:
-	for i in range(51, 56):
-		for j in range(1, 25):
-			for k in range(j+1, 25):
-				f.write('full_org_gray_115x220/original_{0}_{1}.png full_org_gray_115x220/original_{0}_{2}.png 1\n'.format(i, j, k))
-		org_forg = [(j,k) for j in range(1, 25) for k in range(1, 25)]
-		for (j, k) in random.choices(org_forg, k=276):
-			f.write('full_org_gray_115x220/original_{0}_{1}.png full_forg_gray_115x220/forgeries_{0}_{2}.png 0\n'.format(i, j, k))
+
+def generate(file, i):
+    # reference-genuine pairs
+    for j in range(1, num_genuine + 1):
+        for k in range(j + 1, num_genuine + 1):
+            file.write(pair_string_genuine(i, j, k))
+    # reference-forged pairs
+    org_forg = [(j, k) for j in range(1, num_genuine + 1)
+                for k in range(1, num_forged + 1)]
+    for (j, k) in random.choices(org_forg, k=276):
+        file.write(pair_string_forged(i, j, k))
+
+    '''
+    Generate reference-test pair for dataset.
+
+    Input:
+        root: path of dataset
+        mode: which dataset
+        cutting_point: the cutting point to split dataset into train and test
+    Output:
+        None
+    '''
+
+
+def generate_pairs(root: str, cutting_point: int):
+    with open(f'{root}/train_pairs.txt', 'w') as f:
+        for i in range(1, cutting_point):
+            generate(f, i)
+
+    with open(f'{root}/test_pairs.txt', 'w') as f:
+        for i in range(cutting_point, size + 1):
+            generate(f, i)
+
+
+if __name__ == '__main__':
+    resize_img(r'D:\MLProjects\Inverse-Discriminative-Network\dataset\CEDAR\signatures\full_org')
+    resize_img(r'D:\MLProjects\Inverse-Discriminative-Network\dataset\CEDAR\signatures\full_forg')
+    generate_pairs(r'D:\MLProjects\Inverse-Discriminative-Network\dataset\CEDAR\signatures', 51)
 

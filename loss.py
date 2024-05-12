@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 
-class loss(nn.Module):
+class Loss(nn.Module):
     def __init__(self):
-        super(loss, self).__init__()
+        super(Loss, self).__init__()
         self.bce_loss = nn.BCELoss()
 
     

@@ -1,15 +1,16 @@
-from torch.utils import data
+from torch.utils.data import Dataset
 import torch
 import cv2
 import numpy as np
 
-class dataset(data.Dataset):
-    def __init__(self, root='CEDAR/', train=True):
-        super(dataset, self).__init__()
+
+class SignDataLoader(Dataset):
+    def __init__(self, root='dataset/CEDAR/', train=True):
+        super().__init__()
         if train:
-            path = root + 'gray_train.txt'
+            path = root + 'train_pairs.txt'
         else:
-            path = root + 'gray_test.txt'
+            path = root + 'test_pairs.txt'
         
         with open(path, 'r') as f:
             lines = f.readlines()
@@ -26,7 +27,7 @@ class dataset(data.Dataset):
 
             refer_test = np.concatenate((refer_img, test_img), axis=0)
             self.datas.append(refer_test)
-            self.labels.append(int(label))
+            self.labels.append(float(label))
 
         # print(self.datas[0].shape)
 
