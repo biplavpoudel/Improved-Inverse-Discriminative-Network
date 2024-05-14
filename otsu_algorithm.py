@@ -4,18 +4,29 @@
 
 import numpy as np
 import cv2 as cv
+import matplotlib.pyplot as plt
 
 
-def Otsu(image, is_normalized ):
+def Otsu(image, is_normalized=False) -> float:
+    # to convert PIL image into numpy array
+    image_np = np.array(image)
     # Set total number of bins in the histogram
     bins_num = 256
-
     # Get the image histogram
-    hist, bin_edges = np.histogram(image, bins=bins_num)
+    hist, bin_edges = np.histogram(image_np, bins=bins_num)
+    # print(hist.shape)
+    # print(bin_edges)
 
     # Get normalized histogram if it is required
     if is_normalized:
         hist = np.divide(hist.ravel(), hist.max())
+    # Display normalized histogram
+    # plt.bar(bin_edges[:-1], hist)
+    # plt.xlabel('Bins')
+    # plt.ylabel('Frequency')
+    # plt.title('Histogram of Image Data')
+    # plt.show()
+
 
     # Calculate centers of bins
     bin_mids = (bin_edges[:-1] + bin_edges[1:]) / 2.
@@ -35,14 +46,12 @@ def Otsu(image, is_normalized ):
     index_of_max_val = np.argmax(inter_class_variance)
 
     threshold = bin_mids[:-1][index_of_max_val]
-    print("Otsu's algorithm implementation thresholding result: ", threshold)
+    # print("Threshold value: ", threshold)
 
-    revised_image = image - threshold
-    cv.imshow('revised image', revised_image)
-    cv.waitKey(0)
+    return threshold
 
 
 if __name__ == '__main__':
-    image = cv.imread(
+    input_image = cv.imread(
         r'D:\MLProjects\Inverse-Discriminative-Network\dataset_process\CEDAR\signatures\full_forg\forgeries_1_1.png')
-    Otsu(image, is_normalized=True)
+    Otsu(input_image, is_normalized=True)

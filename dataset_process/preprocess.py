@@ -2,6 +2,10 @@ from PIL import Image
 import os
 from utils import parse_args
 import random
+import numpy as np
+from tqdm import tqdm
+import cv2 as cv
+from otsu_algorithm import Otsu
 
 size = 55
 num_genuine = 24
@@ -12,13 +16,21 @@ args = parse_args()
 def resize_img(root, w=220, h=115):
     if not os.path.exists(f'{root}_resize'):
         os.mkdir(f'{root}_resize')
-    for filename in os.listdir(root):
+    _, _, last_name = root.rpartition('\\')
+    root_name = 'Forged Signatures' if last_name == 'full_forg' else 'Genuine Signatures'
+    print(f"\nResizing initiated for: {root_name}")
+    for filename in tqdm(os.listdir(root), colour='WHITE'):
         if filename.endswith('.db'):
             continue
         else:
             with Image.open(f'{root}/{filename}') as img:
-                img = img.resize((w, h))
-                img.save(f'{root}_resize/{filename}')
+                # converts image to grayscale mode and finds global threshold
+                threshold_value = Otsu(img.convert('L'))
+                binary_image = (np.array(img) > threshold_value).astype(np.uint8)*255
+                # to save binary image, we again convert to PIL
+                img_pil = Image.fromarray(binary_image)
+                final_img = img_pil.resize((w, h))
+                final_img.save(f'{root}_resize/{filename}')
 
 
 def genuine_pair(i, j, k):
@@ -56,4 +68,3 @@ if __name__ == '__main__':
     resize_img(r'D:\MLProjects\Inverse-Discriminative-Network\dataset_process\CEDAR\signatures\full_forg')
     resize_img(r'D:\MLProjects\Inverse-Discriminative-Network\dataset_process\CEDAR\signatures\full_org')
     generate_pairs(args.pairs_path, 51)
-
