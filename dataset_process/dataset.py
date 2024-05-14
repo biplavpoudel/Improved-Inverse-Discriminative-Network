@@ -5,7 +5,7 @@ import numpy as np
 
 
 class SignDataLoader(Dataset):
-    def __init__(self, root='dataset/CEDAR/', train=True):
+    def __init__(self, root='dataset_process/CEDAR/', train=True):
         super().__init__()
         if train:
             path = root + 'train_pairs.txt'
@@ -37,5 +37,5 @@ class SignDataLoader(Dataset):
     def __getitem__(self, index):
         return torch.FloatTensor(self.datas[index]), float(self.labels[index])
 
-# img = cv2.imread('dataset/original_2_9.png')
+# img = cv2.imread('dataset_process/original_2_9.png')
 # print(img.shape)

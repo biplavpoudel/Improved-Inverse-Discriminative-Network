@@ -5,7 +5,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 from models.net import net
-from dataset.dataset import SignDataLoader
+from dataset_process.dataset import SignDataLoader
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 post_fix = datetime.now().strftime('%m%d_%H%M%S')
@@ -17,10 +17,14 @@ def parse_args():
                         help='directory of testing model')
     parser.add_argument('--n_epoch', default=1, type=int,
                         help='number of epoch to train')
-    parser.add_argument('--dataset_dir', default='dataset/CEDAR/', type=str,
-                        help='directory of dataset')
+    parser.add_argument('--dataset_dir', default='dataset_process/CEDAR/', type=str,
+                        help='directory of dataset_process')
     parser.add_argument('--model_prefix', default='CEDAR', type=str,
                         help='prefix of model name')
+    parser.add_argument('--pairs_path',
+                        default=r'D:\MLProjects\Inverse-Discriminative-Network\dataset_process\CEDAR\signatures',
+                        type=str,
+                        help='path to generate pairs')
     args = parser.parse_args()
     return args
 

@@ -5,7 +5,7 @@ from tqdm import tqdm
 import time
 cedar_url = r'https://www.cedar.buffalo.edu/NIJ/data/signatures.rar'
 filename = 'cedar.rar'
-extract_path = r'D:/MLProjects/Inverse-Discriminative-Network/dataset/CEDAR'
+extract_path = r'/dataset_process/CEDAR'
 
 
 def download_zip():
