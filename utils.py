@@ -17,7 +17,7 @@ def parse_args():
                         help='directory of testing model')
     parser.add_argument('--n_epoch', default=1, type=int,
                         help='number of epoch to train')
-    parser.add_argument('--dataset_dir', default='dataset_process/CEDAR/', type=str,
+    parser.add_argument('--dataset_dir', default='dataset_process/CEDAR/signatures/', type=str,
                         help='directory of dataset_process')
     parser.add_argument('--model_prefix', default='CEDAR', type=str,
                         help='prefix of model name')
