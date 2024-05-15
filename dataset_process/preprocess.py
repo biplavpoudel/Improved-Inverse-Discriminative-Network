@@ -29,7 +29,8 @@ def resize_img(root, w=220, h=115):
                 binary_image = (np.array(img) > threshold_value).astype(np.uint8)*255
                 # to save binary image, we again convert to PIL
                 img_pil = Image.fromarray(binary_image)
-                final_img = img_pil.resize((w, h))
+                # final_img = img_pil.resize((w, h), Image.LANCZOS)
+                final_img = img_pil.resize((w, h), Image.BICUBIC)
                 final_img.save(f'{root}_resize/{filename}')
 
 
