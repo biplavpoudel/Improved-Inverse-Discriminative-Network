@@ -1,4 +1,4 @@
-# Inverse Discriminative Networks
+# Improved Inverse Discriminative Networks
 
 This is the non-official implement for IDN.<br><br>
 The paper referenced is:
