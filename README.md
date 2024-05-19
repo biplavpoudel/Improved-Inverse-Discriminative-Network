@@ -1,9 +1,9 @@
-# Improved Inverse Discriminative Networks
+# Improved Inverse Discriminative Network
 
-This is the non-official implement for IDN.<br><br>
+This is the non-official implement for Improved IDN.<br><br>
 The paper referenced is:
 
-> P. Wei, H. Li and P. Hu. Inverse Discriminative Networks for Handwritten Signature Verification. [CVPR 2019](https://openaccess.thecvf.com/content_CVPR_2019/papers/Wei_Inverse_Discriminative_Networks_for_Handwritten_Signature_Verification_CVPR_2019_paper.pdf)
+> Nurbiya Xamxidin and et al. Multilingual Offline Signature Verification Based on Improved Inverse Discriminator Network. [Semantic Scholar](https://www.semanticscholar.org/paper/Multilingual-Offline-Signature-Verification-Based-Xamxidin-Mahpirat/8e28b02fb36ecf4f96798bd16825d8e1003dbb08)
 
 
 
