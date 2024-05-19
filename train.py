@@ -95,7 +95,7 @@ def train():
                         accuracys.append(compute_accuracy(predicted_, labels_))
                     accuracy_ = sum(accuracys) / len(accuracys)
                     writer.add_scalar(t + '/test_accuracy', accuracy_, iter_n)
-                print('test loss:{:.6f}'.format(accuracy_))
+                print('\nValidation Accuracy:{:.3f}'.format(accuracy_))
 
                 if accuracy_ >= best_test_accuracy:
                     best_test_accuracy = accuracy_
@@ -105,6 +105,10 @@ def train():
 
 
             iter_n += 1
-            print('Epoch[{}/{}], iter {}, loss:{:.6f}, accuracy:{}'.format(epoch, EPOCHS, i, loss.item(), accuracy))
+            print('\nEpoch[{}/{}], iter {}, loss:{:.3f}, accuracy:{}'.format(epoch, EPOCHS, i, loss.item(), accuracy))
 
     writer.close()
+
+
+if __name__ == '__main__':
+    train()
