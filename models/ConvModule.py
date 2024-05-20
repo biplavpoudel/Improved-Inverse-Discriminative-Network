@@ -7,11 +7,12 @@ class ConvModule(nn.Module):
         super(ConvModule, self).__init__()
 
         self.module = nn.Sequential(
-            nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(1, 32, kernel_size=3, stride=2, padding=1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=2, stride=2)
+            nn.Upsample(size=(115, 220), mode='bicubic', align_corners=False),
+            nn.Conv2d(32, 32, kernel_size=3, stride=(1, 1), padding=1),
+            # nn.ReLU(inplace=True),
+            # nn.MaxPool2d(kernel_size=2, stride=2)
         )
 
     def forward(self, inputs):
@@ -34,7 +35,7 @@ if __name__ == '__main__':
     model = ConvModule()
     print(model)
 
-    input = torch.randn(1, 2, 11, 28)
+    input = torch.randn(1, 2, 384, 96)
     output = model(input)
 
     for items in output:

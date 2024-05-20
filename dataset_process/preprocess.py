@@ -13,7 +13,7 @@ num_forged = 24
 args = parse_args()
 
 
-def resize_img(root, w=220, h=115):
+def resize_img(root, w=384, h=96):
     if not os.path.exists(f'{root}_resize'):
         os.mkdir(f'{root}_resize')
     _, _, last_name = root.rpartition('\\')
