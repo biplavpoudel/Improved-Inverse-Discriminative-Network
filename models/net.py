@@ -49,6 +49,6 @@ class net(nn.Module):
 
 if __name__ == '__main__':
     net = net()
-    input= torch.randn(1, 2, 115, 220)
+    input = torch.randn(1, 2, 115, 220)
     out_1, out_2, out_3 = net(input)
     print(out_1, out_2, out_3)

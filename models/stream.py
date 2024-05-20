@@ -32,6 +32,7 @@ class stream(nn.Module):
 			nn.MaxPool2d(2, stride=2)
 			)
 
+		self.Conv_1x1 = nn.Conv2d(128, 256, 1, stride=1, padding=0)
 		self.Conv_32 = nn.Conv2d(32, 32, 3, stride=1, padding=1)
 		self.Conv_64 = nn.Conv2d(64, 64, 3, stride=1, padding=1)
 		self.Conv_96 = nn.Conv2d(96, 96, 3, stride=1, padding=1)
@@ -61,20 +62,16 @@ class stream(nn.Module):
 
 		return reference, inverse
 
+	def enhanced_spatial_attention(self, inverse, discriminative):
+		conv1 = getattr(self, 'Conv_' + str({}), 'None').format('1x1')
+		feature1 = conv1(inverse)
+		
+		pass
 
 	def attention(self, inverse, discriminative):
-		# Conv = nn.Sequential(
-		# 	nn.Conv2d(inverse.size()[1], inverse.size()[1], 3, stride=1, padding=1),
-		# 	nn.Sigmoid()
-		# )
 		GAP = nn.AdaptiveAvgPool2d((1, 1))
 		sigmoid = nn.Sigmoid()
-		# fc = nn.Sequential(
-		# 	nn.Linear(inverse.size()[1], inverse.size()[1]),
-		# 	nn.Sigmoid()
-		# )
 
-		# print(inverse.size(), discriminative.size())
 		up_sample = nn.functional.interpolate(inverse, (discriminative.size()[2], discriminative.size()[3]), mode='nearest')
 		# g = self.Conv(up_sample)
 		conv = getattr(self, 'Conv_' + str(up_sample.size()[1]), 'None')
@@ -98,6 +95,5 @@ class stream(nn.Module):
 
 if __name__ == '__main__':
 	model = stream()
-	# r, i = model(torch.ones(1,3,32,32), torch.ones(1,3,32,32))
-	# print(r.size(), i.size())
-	x = {}
+	r, i = model(torch.ones(1, 32, 115, 220), torch.ones(1, 32, 115, 220))
+	print(r.size(), i.size())
