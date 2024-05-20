@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from models.stream import stream
+from models.ConvModule import ConvModule
 import torchvision
 
 class net(nn.Module):
@@ -8,6 +9,7 @@ class net(nn.Module):
         super(net, self).__init__()
 
         self.stream = stream()
+        self.module = ConvModule()
         self.GAP = nn.AdaptiveAvgPool2d((1,1))
         self.classifier = nn.Sequential(
             nn.Linear(256, 256),
@@ -20,13 +22,8 @@ class net(nn.Module):
         
 
     def forward(self, inputs):
-        half = inputs.size()[1] // 2
-        reference = inputs[:, :half, :, :]
-        reference_inverse = 255 - reference
-        test = inputs[:, half:, :, :]
-        del inputs
-        test_inverse = 255 - test
 
+        reference, reference_inverse, test, test_inverse = self.module(inputs)
         reference, reference_inverse = self.stream(reference, reference_inverse)
         test, test_inverse = self.stream(test, test_inverse)
 
@@ -49,12 +46,9 @@ class net(nn.Module):
 
         return out
 
+
 if __name__ == '__main__':
     net = net()
-    x = torch.ones(1, 3, 32, 32)
-    y = torch.ones(1, 3, 32, 32)
-    x_ = torch.ones(1, 3, 32, 32)
-    y_ = torch.ones(1, 3, 32, 32)
-    out_1, out_2, out_3 = net(x, y, x_, y_)
-    # vgg = torchvision.models.vgg13()
-    # print(vgg)
+    input= torch.randn(1, 2, 115, 220)
+    out_1, out_2, out_3 = net(input)
+    print(out_1, out_2, out_3)
