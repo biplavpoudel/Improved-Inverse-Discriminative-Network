@@ -84,8 +84,9 @@ class stream(nn.Module):
 		fc = getattr(self, 'fc_' + str(f.size(2)), 'None')
 		f = fc(f)
 		f = sigmoid(f)
+		# print("f size before modifying: ", f.size())
 		f = f.view(-1, f.size()[2], 1, 1)
-		# print(tmp.size(), f.size())
+		print("Temp size is", tmp.size(), "f size is:", f.size())
 		out = tmp * f
 
 		return out
@@ -94,4 +95,4 @@ class stream(nn.Module):
 if __name__ == '__main__':
 	model = stream()
 	r, i = model(torch.ones(1, 32, 115, 220), torch.ones(1, 32, 115, 220))
-	print(r.size(), i.size())
+	# print(r.size(), i.size())

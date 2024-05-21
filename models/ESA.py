@@ -6,7 +6,7 @@ import numpy as np
 
 
 class ESA(nn.Module):
-    def __init_(self, in_channels=32, reduction_factor=8):
+    def __init__(self, in_channels=32, reduction_factor=8):
         super(ESA, self).__init__()
         reduced_channels = int(in_channels//reduction_factor)
         self.conv1x1_1 = nn.Conv2d(in_channels=in_channels, out_channels=reduced_channels, kernel_size=1, stride=1, padding=0)
@@ -37,3 +37,6 @@ class ESA(nn.Module):
 if __name__ == '__main__':
     model = ESA()
     print(model)
+    input = torch.randn(1, 32, 224, 224)
+    out = model(input)
+    print(out.shape)

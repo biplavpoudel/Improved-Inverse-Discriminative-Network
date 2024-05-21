@@ -22,7 +22,7 @@ def parse_args():
     parser.add_argument('--model_prefix', default='CEDAR', type=str,
                         help='prefix of model name')
     parser.add_argument('--pairs_path',
-                        default=r'D:\MLProjects\Inverse-Discriminative-Network\dataset_process\CEDAR\signatures',
+                        default=r'D:\MLProjects\Improved-Inverse-Discriminative-Network\dataset_process\CEDAR\signatures',
                         type=str,
                         help='path to generate pairs')
     args = parser.parse_args()

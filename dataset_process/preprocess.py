@@ -26,7 +26,8 @@ def resize_img(root, w=384, h=96):
         else:
             with Image.open(f'{root}/{filename}') as img:
                 # converts image to grayscale mode and finds global threshold
-                threshold_value = Otsu(img.convert('L'))
+                img = img.convert('L')
+                threshold_value = Otsu(img)
                 binary_image = (np.array(img) > threshold_value).astype(np.uint8)*255
                 # to save binary image, we again convert to PIL
                 img_pil = Image.fromarray(binary_image)
@@ -68,6 +69,6 @@ def generate_pairs(root: str, split: int):
 
 
 if __name__ == '__main__':
-    resize_img(r'D:\MLProjects\Inverse-Discriminative-Network\dataset_process\CEDAR\signatures\full_forg')
-    resize_img(r'D:\MLProjects\Inverse-Discriminative-Network\dataset_process\CEDAR\signatures\full_org')
+    resize_img(r'D:\MLProjects\Improved-Inverse-Discriminative-Network\dataset_process\CEDAR\signatures\full_forg')
+    resize_img(r'D:\MLProjects\Improved-Inverse-Discriminative-Network\dataset_process\CEDAR\signatures\full_org')
     generate_pairs(args.pairs_path, 51)
