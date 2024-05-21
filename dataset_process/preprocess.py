@@ -1,4 +1,5 @@
 from PIL import Image
+import PIL.ImageOps
 import os
 from utils import parse_args
 import random
@@ -29,8 +30,9 @@ def resize_img(root, w=384, h=96):
                 binary_image = (np.array(img) > threshold_value).astype(np.uint8)*255
                 # to save binary image, we again convert to PIL
                 img_pil = Image.fromarray(binary_image)
+                img_invert = PIL.ImageOps.invert(img_pil)
                 # final_img = img_pil.resize((w, h), Image.LANCZOS)
-                final_img = img_pil.resize((w, h), Image.BICUBIC)
+                final_img = img_invert.resize((w, h), Image.BICUBIC)
                 final_img.save(f'{root}_resize/{filename}')
 
 

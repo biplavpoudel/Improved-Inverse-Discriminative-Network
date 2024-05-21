@@ -6,27 +6,34 @@ import numpy as np
 
 
 class ESA(nn.Module):
-    def __init_(self):
+    def __init_(self, in_channels=32, reduction_factor=8):
         super(ESA, self).__init__()
-        self.conv1x1_1 = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=1, stride=1, padding=0)
-        self.conv_stride = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, stride=2, padding=1)
+        reduced_channels = int(in_channels//reduction_factor)
+        self.conv1x1_1 = nn.Conv2d(in_channels=in_channels, out_channels=reduced_channels, kernel_size=1, stride=1, padding=0)
+        self.conv_stride = nn.Conv2d(in_channels=reduced_channels, out_channels=reduced_channels, kernel_size=3, stride=2, padding=1)
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.conv_group = nn.Conv2d(in_channels=32, out_channels=64,kernel_size=3, stride=0, padding=1, groups=4)
+        # Grouped Convolution with number of convolutions equal to number of input channels
+        self.conv_group = nn.Conv2d(in_channels=reduced_channels, out_channels=reduced_channels, kernel_size=3, stride=1, padding=1, groups=reduced_channels)
         self.upsampler = nn.Upsample(scale_factor=4, mode='bicubic', align_corners=False)
-        self.conv1x1_2 = nn.Conv2d(in_channels=64, out_channels=32, kernel_size=1, stride=1, padding=0)
+        self.conv1x1_2 = nn.Conv2d(in_channels=reduced_channels, out_channels=in_channels, kernel_size=1, stride=1, padding=0)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, input):
         original_input = input
 
-        reduced_feature = self.conv1x1_1(input) # Apply first 1x1 convolution
-        strided_feature = self.conv_stride(reduced_feature) # Apply stride convolution
-        pooled_feature = self.pool(strided_feature) # Apply pooling
-        grouped_feature = self.conv_group(pooled_feature) # Apply grouped convolution
-        upsampled_feature = self.upsampler(grouped_feature) # Upsample to original size
-        reduced2_feature = self.conv1x1_2(upsampled_feature) # Apply second 1x1 convolution
-        attention_mask = self.sigmoid(reduced2_feature) # Generate attention mask
+        reduced_feature = self.conv1x1_1(input)     # First 1x1 convolution to reduce channels
+        strided_feature = self.conv_stride(reduced_feature)  # Stride convolution
+        pooled_feature = self.pool(strided_feature)     # Pooling
+        grouped_feature = self.conv_group(pooled_feature)    # Grouped convolution
+        upsampled_feature = self.upsampler(grouped_feature)     # Upsample to original size
+        reduced2_feature = self.conv1x1_2(upsampled_feature)     # Second 1x1 convolution to restore channel size
+        attention_mask = self.sigmoid(reduced2_feature)     # Generate attention mask
 
-        # Apply attention mask using element-wise Hadamard multiplication
-        out = original_input * attention_mask
-        return out
+        # # Apply attention mask using element-wise Hadamard multiplication
+        # out = original_input * attention_mask
+        return attention_mask
+
+
+if __name__ == '__main__':
+    model = ESA()
+    print(model)

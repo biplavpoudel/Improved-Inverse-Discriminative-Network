@@ -1,10 +1,12 @@
 import torch
 import torch.nn as nn
+from models.ESA import ESA
 import cv2
 
 class stream(nn.Module):
 	def __init__(self):
 		super(stream, self).__init__()
+		self.spatial_attention = ESA()
 
 		self.stream = nn.Sequential(
 			nn.Conv2d(32, 32, 3, stride=1, padding=1),
@@ -62,11 +64,7 @@ class stream(nn.Module):
 
 		return reference, inverse
 
-	def enhanced_spatial_attention(self, inverse, discriminative):
-		conv1 = getattr(self, 'Conv_' + str({}), 'None').format('1x1')
-		feature1 = conv1(inverse)
-		
-		pass
+
 
 	def attention(self, inverse, discriminative):
 		GAP = nn.AdaptiveAvgPool2d((1, 1))
