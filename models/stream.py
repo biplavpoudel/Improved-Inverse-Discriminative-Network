@@ -1,4 +1,4 @@
-# This is a rough implementation of four SE blocks for each input stream with ResNet i.e. ResNetSE modules
+# This is a rough implementation of four SE blocks for each input stream
 import torch
 import torch.nn as nn
 from models.ESA import ESA
