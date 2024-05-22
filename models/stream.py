@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from models.ESA import ESA
-import cv2
+
 
 class stream(nn.Module):
 	def __init__(self):
@@ -44,7 +44,7 @@ class stream(nn.Module):
 		self.fc_64 = nn.Linear(64, 64)
 		self.fc_96 = nn.Linear(96, 96)
 		self.fc_128 = nn.Linear(128, 128)
-		
+
 		self.max_pool = nn.MaxPool2d(2, stride=2)
 
 	def forward(self, reference, inverse):
@@ -56,40 +56,12 @@ class stream(nn.Module):
 			inverse = self.stream[2 + i * 5](inverse)
 			inverse = self.stream[3 + i * 5](inverse)
 			inverse = self.stream[4 + i * 5](inverse)
-			reference = self.attention(inverse, reference)
+			reference = self.spatial_attention(inverse)
 			reference = self.stream[2 + i * 5](reference)
 			reference = self.stream[3 + i * 5](reference)
 			reference = self.stream[4 + i * 5](reference)
-			
 
 		return reference, inverse
-
-
-
-	def attention(self, inverse, discriminative):
-		GAP = nn.AdaptiveAvgPool2d((1, 1))
-		sigmoid = nn.Sigmoid()
-
-		up_sample = nn.functional.interpolate(inverse, (discriminative.size()[2], discriminative.size()[3]), mode='nearest')
-		# g = self.Conv(up_sample)
-		conv = getattr(self, 'Conv_' + str(up_sample.size()[1]), 'None')
-		g = conv(up_sample)
-		g = sigmoid(g)
-		# print(g.size(), discriminative.size())
-		tmp = g * discriminative + discriminative
-		f = GAP(tmp)
-		f = f.view(f.size()[0], 1, f.size()[1])
-		
-		# f = self.fc(f)
-		fc = getattr(self, 'fc_' + str(f.size(2)), 'None')
-		f = fc(f)
-		f = sigmoid(f)
-		# print("f size before modifying: ", f.size())
-		f = f.view(-1, f.size()[2], 1, 1)
-		print("Temp size is", tmp.size(), "f size is:", f.size())
-		out = tmp * f
-
-		return out
 
 
 if __name__ == '__main__':
