@@ -2,13 +2,14 @@
 import torch
 import torch.nn as nn
 from models.ESA import ESA
-import torchvision.models as models
+from models.SqueezeAndExcitation import SEBlock
+# import torchvision.models as models
+# May implement ResNetSE block in the future but not now
 
 
 class stream(nn.Module):
 	def __init__(self):
 		super(stream, self).__init__()
-		self.spatial_attention = ESA()
 
 		self.stream = nn.Sequential(
 			nn.Conv2d(32, 32, 3, stride=1, padding=1),
@@ -36,30 +37,30 @@ class stream(nn.Module):
 			nn.MaxPool2d(2, stride=2)
 			)
 
-		self.Conv_1x1 = nn.Conv2d(128, 256, 1, stride=1, padding=0)
-		self.Conv_32 = nn.Conv2d(32, 32, 3, stride=1, padding=1)
-		self.Conv_64 = nn.Conv2d(64, 64, 3, stride=1, padding=1)
-		self.Conv_96 = nn.Conv2d(96, 96, 3, stride=1, padding=1)
-		self.Conv_128 = nn.Conv2d(128, 128, 3, stride=1, padding=1)
+		self.squeeze_excitation1 = SEBlock(in_channels=32)
+		self.squeeze_excitation2 = SEBlock(in_channels=64)
+		self.squeeze_excitation3 = SEBlock(in_channels=96)
+		self.squeeze_excitation4 = SEBlock(in_channels=128)
 
-		self.fc_32 = nn.Linear(32, 32)
-		self.fc_64 = nn.Linear(64, 64)
-		self.fc_96 = nn.Linear(96, 96)
-		self.fc_128 = nn.Linear(128, 128)
-
-		self.max_pool = nn.MaxPool2d(2, stride=2)
+		self.spatial_attention1 = ESA(in_channels=32)
+		self.spatial_attention2 = ESA(in_channels=64)
+		self.spatial_attention3 = ESA(in_channels=96)
+		self.spatial_attention4 = ESA(in_channels=128)
 
 	def forward(self, reference, inverse):
 		for i in range(4):
-			reference = self.stream[0 + i * 5](reference)
-			reference = self.stream[1 + i * 5](reference)
 			inverse = self.stream[0 + i * 5](inverse)
 			inverse = self.stream[1 + i * 5](inverse)
 			inverse = self.stream[2 + i * 5](inverse)
 			inverse = self.stream[3 + i * 5](inverse)
 			inverse = self.stream[4 + i * 5](inverse)
-			reference = self.spatial_attention(inverse)
-			reference = self.stream[2 + i * 5](reference)
+			excited_feature = getattr(self, 'squeeze_excitation' + str(i+1))(inverse)
+			
+			attention = getattr(self, 'spatial_attention' + str(i+1))(excited_feature)
+
+			reference = self.stream[0 + i * 5](reference)
+			reference = self.stream[1 + i * 5](reference)
+			reference = self.stream[2 + i * 5](reference) * attention
 			reference = self.stream[3 + i * 5](reference)
 			reference = self.stream[4 + i * 5](reference)
 
