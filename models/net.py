@@ -4,6 +4,7 @@ from models.stream import stream
 from models.ConvModule import ConvModule
 import torchvision
 
+
 class net(nn.Module):
     def __init__(self):
         super(net, self).__init__()

@@ -1,6 +1,6 @@
 # Improved Inverse Discriminative Network
 
-This is the non-official implement for Improved IDN.<br><br>
+This is the non-official implementation for Improved IDN.<br><br>
 The paper referenced is:
 
 > Nurbiya Xamxidin and et al. Multilingual Offline Signature Verification Based on Improved Inverse Discriminator Network. [Semantic Scholar](https://www.semanticscholar.org/paper/Multilingual-Offline-Signature-Verification-Based-Xamxidin-Mahpirat/8e28b02fb36ecf4f96798bd16825d8e1003dbb08)
