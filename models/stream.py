@@ -37,6 +37,11 @@ class stream(nn.Module):
 			nn.MaxPool2d(2, stride=2)
 			)
 
+		self.Conv_32 = nn.Conv2d(32, 32, 3, stride=1, padding=1)
+		self.Conv_64 = nn.Conv2d(64, 64, 3, stride=1, padding=1)
+		self.Conv_96 = nn.Conv2d(96, 96, 3, stride=1, padding=1)
+		self.Conv_128 = nn.Conv2d(128, 128, 3, stride=1, padding=1)
+
 		self.squeeze_excitation1 = SEBlock(in_channels=32)
 		self.squeeze_excitation2 = SEBlock(in_channels=64)
 		self.squeeze_excitation3 = SEBlock(in_channels=96)
@@ -49,22 +54,41 @@ class stream(nn.Module):
 
 	def forward(self, reference, inverse):
 		for i in range(4):
+			residual_identity = reference
+
+			reference = self.stream[0 + i * 5](reference)
+			reference = self.stream[1 + i * 5](reference)
+			reference = self.stream[2 + i * 5](reference)
+			reference = self.stream[3 + i * 5](reference)
+			reference = self.stream[4 + i * 5](reference)
+
 			inverse = self.stream[0 + i * 5](inverse)
 			inverse = self.stream[1 + i * 5](inverse)
 			inverse = self.stream[2 + i * 5](inverse)
 			inverse = self.stream[3 + i * 5](inverse)
 			inverse = self.stream[4 + i * 5](inverse)
-			excited_feature = getattr(self, 'squeeze_excitation' + str(i+1))(inverse)
-			
-			attention = getattr(self, 'spatial_attention' + str(i+1))(excited_feature)
 
-			reference = self.stream[0 + i * 5](reference)
-			reference = self.stream[1 + i * 5](reference)
-			reference = self.stream[2 + i * 5](reference) * attention
-			reference = self.stream[3 + i * 5](reference)
-			reference = self.stream[4 + i * 5](reference)
+			# excited_inverse = getattr(self, 'squeeze_excitation' + str(i + 1))(inverse)
+			# print("Size of SE block from inverse stream is:", excited_inverse.shape)
+
+			reference, inverse = self.attention(i, inverse, reference)
 
 		return reference, inverse
+
+	def attention(self, i, inverse, discriminative):
+
+		print(inverse.size(), discriminative.size())
+		excited_inverse = getattr(self, 'squeeze_excitation' + str(i+1))(inverse)
+
+		g = getattr(self, 'spatial_attention' + str(i+1))(excited_inverse)
+
+		aggregated_features = g * discriminative
+
+		channel_attention = getattr(self, 'squeeze_excitation' + str(i+1))(aggregated_features)
+		temp = aggregated_features * channel_attention
+		out = temp + discriminative
+
+		return out, excited_inverse
 
 
 if __name__ == '__main__':

@@ -20,18 +20,12 @@ class ESA(nn.Module):
 
     def forward(self, input):
         reduced_feature = self.conv1x1_1(input) # First 1x1 convolution to reduce channels
-        # print("Shape after first 1x1 conv: ", reduced_feature.shape)
         strided_feature = self.conv_stride(reduced_feature)  # Stride convolution
-        # print("Shape after stride conv: ", strided_feature.shape)
         pooled_feature = self.pool(strided_feature)     # Pooling
-        # print("Shape after pooling: ", pooled_feature.shape)
         grouped_feature = self.conv_group(pooled_feature)    # Grouped convolution
-        # print("Shape after grouping: ", grouped_feature.shape)
         # upsampled_feature = self.upsampler(grouped_feature)     # Upsample to original size
         upsampled_feature = nn.functional.interpolate(grouped_feature, size=input.size()[2:], mode='bilinear', align_corners=False)
-        # print("Shape after upsampling: ", upsampled_feature.shape)
         reduced2_feature = self.conv1x1_2(upsampled_feature)     # Second 1x1 convolution to restore channel size
-        # print("Shape after conv1x1_2: ", reduced2_feature.shape)
         attention = self.sigmoid(reduced2_feature)     # Generate attention mask
 
         # Scaled connection

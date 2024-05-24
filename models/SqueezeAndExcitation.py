@@ -17,7 +17,7 @@ class SEBlock(nn.Module):
 
     def forward(self, x):
         pooled = self.avg_pool(x).squeeze(-1).squeeze(-1)
-        print("The size of squeezed pooled feature is: ", pooled.shape)
+        # print("The size of squeezed pooled feature is: ", pooled.shape)
         excite = self.excite(pooled)
         scaled = x * excite.unsqueeze(-1).unsqueeze(-1)
         return scaled
