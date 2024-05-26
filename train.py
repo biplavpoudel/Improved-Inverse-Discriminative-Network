@@ -1,5 +1,6 @@
 import torch
 import torch.optim as optim
+from torch.cuda.amp import GradScaler, autocast
 import numpy as np
 from pynvml import *
 import os
@@ -18,6 +19,7 @@ else:
     device = 'cpu'
 print("The device is {}".format(device))
 args = parse_args()
+
 
 def compute_accuracy(predicted, labels):
     for i in range(3):
@@ -46,6 +48,8 @@ def train():
     train_loader = DataLoader(train_set, batch_size=BATCH_SIZE, shuffle=True)
     test_loader = DataLoader(test_set, batch_size=2 * BATCH_SIZE, shuffle=False)
 
+    scaler = GradScaler()
+
     model = net()
     if cuda:
         model = model.cuda()
@@ -72,19 +76,20 @@ def train():
             if cuda:
                 inputs, labels = inputs.cuda(), labels.cuda()
 
-            predicted = model(inputs)
+            with autocast():
+                predicted = model(inputs)
+                loss = criterion(*predicted, labels)
 
-            loss = criterion(*predicted, labels)
-
-            loss.backward()
-            optimizer.step()
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
 
             accuracy = compute_accuracy(predicted, labels)
 
             writer.add_scalar(t + '/train_loss', loss.item(), iter_n)
             writer.add_scalar(t + '/train_accuracy', accuracy, iter_n)
 
-            if i % 100 == 0:
+            if (i+1) % 100 == 0:
                 with torch.no_grad():
                     accuracys = []
                     for i_, (inputs_, labels_) in enumerate(tqdm(test_loader)):
@@ -101,8 +106,6 @@ def train():
                     best_test_accuracy = accuracy_
                     torch.save(model.state_dict(),
                                f'{args.model_prefix}_{accuracy_:.3%}.pt')
-
-
 
             iter_n += 1
             print('\nEpoch[{}/{}], iter {}, loss:{:.3f}, accuracy:{}'.format(epoch, EPOCHS, i, loss.item(), accuracy))

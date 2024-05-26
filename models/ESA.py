@@ -37,6 +37,7 @@ if __name__ == '__main__':
     model = ESA()
     # print(model)
     input = torch.randn(1, 32, 115, 220)
+
     print("Input Shape: ", input.shape)
     out = model(input)
     print("Output Shape: ", out.shape)

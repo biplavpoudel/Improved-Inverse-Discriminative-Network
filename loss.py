@@ -4,7 +4,7 @@ import torch.nn as nn
 class Loss(nn.Module):
     def __init__(self):
         super(Loss, self).__init__()
-        self.bce_loss = nn.BCELoss()
+        self.bce_loss = nn.BCEWithLogitsLoss()
 
     
     def forward(self, x, y, z, label):
