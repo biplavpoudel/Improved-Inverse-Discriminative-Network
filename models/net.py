@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from models.stream import stream
 from models.ConvModule import ConvModule
+from torchsummary import summary
 import torchvision
 
 
@@ -49,7 +50,9 @@ class net(nn.Module):
 
 
 if __name__ == '__main__':
-    net = net()
+    net = net().cuda()
     input = torch.randn(1, 2, 115, 220)
-    out_1, out_2, out_3 = net(input)
-    print(out_1, out_2, out_3)
+    print("The model summary is: ")
+    summary(model=net, input_size=(2, 115, 220), batch_size=1, device="cuda")
+    # out_1, out_2, out_3 = net(input)
+    # print(out_1, out_2, out_3)
