@@ -84,7 +84,7 @@ def train():
             writer.add_scalar(t + '/train_loss', loss.item(), iter_n)
             writer.add_scalar(t + '/train_accuracy', accuracy, iter_n)
 
-            if i % 100 == 0:
+            if (i+1) % 100 == 0:
                 with torch.no_grad():
                     accuracys = []
                     for i_, (inputs_, labels_) in enumerate(tqdm(test_loader)):
