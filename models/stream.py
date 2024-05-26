@@ -75,7 +75,7 @@ class stream(nn.Module):
 
 		temp = aggregated_features * channel_attention
 		out = temp + discriminative		# SEResNet Block for inverse stream
-
+		#
 		return out, excited_inverse
 
 

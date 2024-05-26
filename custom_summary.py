@@ -11,7 +11,7 @@ class CustomSummary:
 
     def print_summary(self):
         # Print the standard summary
-        summary(self.model, self.input_size, self.device)
+        summary(self.model, self.input_size, batch_size=1, device=self.device)
 
     def print_detailed_summary(self):
         # Print detailed layer information
@@ -39,9 +39,11 @@ if __name__ == '__main__':
     # Import the model (ensure the correct import path)
     from models.SqueezeAndExcitation import SEBlock
     from models.ESA import ESA
+    from models.net import net
 
     # model = SEBlock(in_channels=32).cuda()
-    model = ESA().cuda()
-    input_size = (32, 115, 220)
+    # model = ESA().cuda()
+    model = net().cuda()
+    input_size = (2, 115, 220)
     custom_summary = CustomSummary(model, input_size)
     custom_summary.print_summary()
