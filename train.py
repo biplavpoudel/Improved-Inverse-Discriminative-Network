@@ -59,7 +59,7 @@ def train():
         criterion = criterion.cuda()
     iter_n = 0
     t = time.strftime("%m-%d-%H-%M", time.localtime())
-    print(len(train_loader))
+    print("The size of train datasets with each batch of size 32 is", len(train_loader))
     best_test_accuracy = 0
 
     for epoch in tqdm(range(1, EPOCHS + 1)):
