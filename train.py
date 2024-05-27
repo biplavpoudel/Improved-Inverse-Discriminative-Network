@@ -48,11 +48,16 @@ def train():
     train_loader = DataLoader(train_set, batch_size=BATCH_SIZE, shuffle=True)
     test_loader = DataLoader(test_set, batch_size=2 * BATCH_SIZE, shuffle=False)
 
+    image, labels = next(iter(train_loader))
+    print(image[0][1])
+    print(labels[0])
+
     scaler = GradScaler()
 
     model = net()
     if cuda:
         model = model.cuda()
+
     criterion = Loss()
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
     # optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE)
@@ -64,51 +69,54 @@ def train():
     iter_n = 0
     t = time.strftime("%m-%d-%H-%M", time.localtime())
     print("The size of train datasets with each batch of size 32 is", len(train_loader))
-    best_test_accuracy = 0
+    best_valid_accuracy = 0
 
-    for epoch in tqdm(range(1, EPOCHS + 1)):
-        for i, (inputs, labels) in enumerate(tqdm(train_loader)):
-            torch.cuda.empty_cache()
-
-            optimizer.zero_grad()
-
-            labels = labels.float()
-            if cuda:
-                inputs, labels = inputs.cuda(), labels.cuda()
-
-            with autocast():
-                predicted = model(inputs)
-                loss = criterion(*predicted, labels)
-
-            scaler.scale(loss).backward()
-            scaler.step(optimizer)
-            scaler.update()
-
-            accuracy = compute_accuracy(predicted, labels)
-
-            writer.add_scalar(t + '/train_loss', loss.item(), iter_n)
-            writer.add_scalar(t + '/train_accuracy', accuracy, iter_n)
-
-            if (i+1) % 100 == 0:
-                with torch.no_grad():
-                    accuracys = []
-                    for i_, (inputs_, labels_) in enumerate(tqdm(test_loader)):
-                        labels_ = labels_.float()
-                        if cuda:
-                            inputs_, labels_ = inputs_.cuda(), labels_.cuda()
-                        predicted_ = model(inputs_)
-                        accuracys.append(compute_accuracy(predicted_, labels_))
-                    accuracy_ = sum(accuracys) / len(accuracys)
-                    writer.add_scalar(t + '/test_accuracy', accuracy_, iter_n)
-                print('\nValidation Accuracy:{:.3f}'.format(accuracy_))
-
-                if accuracy_ >= best_test_accuracy:
-                    best_test_accuracy = accuracy_
-                    torch.save(model.state_dict(),
-                               f'{args.model_prefix}_{accuracy_:.3%}.pt')
-
-            iter_n += 1
-            print('\nEpoch[{}/{}], iter {}, loss:{:.3f}, accuracy:{}'.format(epoch, EPOCHS, i, loss.item(), accuracy))
+    # for epoch in tqdm(range(1, EPOCHS + 1)):
+    #     # Training is initiated
+    #     for i, (inputs, labels) in enumerate(tqdm(train_loader)):
+    #         torch.cuda.empty_cache()
+    #
+    #         optimizer.zero_grad()
+    #
+    #         labels = labels.float()
+    #         if cuda:
+    #             inputs, labels = inputs.cuda(), labels.cuda()
+    #
+    #         with autocast(), torch.autograd.detect_anomaly(check_nan=True):
+    #             predicted = model(inputs)
+    #             loss = criterion(*predicted, labels)
+    #
+    #         scaler.scale(loss).backward()
+    #         scaler.step(optimizer)
+    #         scaler.update()
+    #
+    #         accuracy = compute_accuracy(predicted, labels)
+    #
+    #         writer.add_scalar(t + '/train_loss', loss.item(), iter_n)
+    #         writer.add_scalar(t + '/train_accuracy', accuracy, iter_n)
+    #
+    #         # For Validation for each 100 iterations of training
+    #         if (i+1) % 100 == 0:
+    #             with torch.no_grad():
+    #                 accuracies = []
+    #                 for i_, (inputs_, labels_) in enumerate(tqdm(test_loader)):
+    #                     labels_ = labels_.float()
+    #                     if cuda:
+    #                         inputs_, labels_ = inputs_.cuda(), labels_.cuda()
+    #                     with autocast(), torch.autograd.detect_anomaly(check_nan=True):
+    #                         predicted_ = model(inputs_)
+    #                     accuracies.append(compute_accuracy(predicted_, labels_))
+    #                 accuracy_ = sum(accuracies) / len(accuracies)
+    #                 writer.add_scalar(t + '/test_accuracy', accuracy_, iter_n)
+    #             print('\nValidation Accuracy:{:.3f}'.format(accuracy_))
+    #
+    #             if accuracy_ >= best_valid_accuracy:
+    #                 best_valid_accuracy = accuracy_
+    #                 torch.save(model.state_dict(),
+    #                            f'{args.model_prefix}_{accuracy_:.3%}.pt')
+    #
+    #         iter_n += 1
+    #         print('\nEpoch[{}/{}], iter {}, loss:{:.3f}, accuracy:{}'.format(epoch, EPOCHS, i, loss.item(), accuracy))
 
     writer.close()
 

@@ -45,11 +45,11 @@ if __name__ == '__main__':
 
     # model = SEBlock(in_channels=32).cuda()
     # model = ESA().cuda()
-    # model = net().cuda()
+    model = net().cuda()
     # model = ConvModule().cuda()
-    model = stream().cuda()
+    # model = stream().cuda()
     net_input_size = (2, 115, 220)
     esa_size = (32, 115, 220)
     stream_size = [(32, 115, 200), (32, 115, 200)]
-    custom_summary = CustomSummary(model, stream_size)
+    custom_summary = CustomSummary(model, net_input_size)
     custom_summary.print_summary()
