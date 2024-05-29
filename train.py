@@ -21,6 +21,10 @@ print("The device is {}".format(device))
 args = parse_args()
 
 
+def normalize(inputs):
+    # Normalize to range [0, 1]
+    return inputs / 255.0
+
 def compute_accuracy(predicted, labels):
     for i in range(3):
         predicted[i][predicted[i] > 0.5] = 1
@@ -50,11 +54,11 @@ def train():
 
     # For testing if my dataloader is yielding Nan or inf
     # Spoiler: it isn't
-    image, labels = next(iter(train_loader))
-    print(torch.max(image[0][0]))
-    print(torch.max(labels))
+    # image, labels = next(iter(train_loader))
+    # print(torch.max(image[0][0]))
+    # print(torch.max(labels))
 
-    scaler = GradScaler()
+    scaler = GradScaler(init_scale=2.**10, growth_factor=2.0, backoff_factor=0.5, growth_interval=2000)
 
     model = net()
     if cuda:
@@ -80,15 +84,19 @@ def train():
 
             optimizer.zero_grad()
 
-            labels = labels.float()
-            if cuda:
-                inputs, labels = inputs.cuda(), labels.cuda()
+            inputs, labels = inputs.cuda(), labels.cuda()
+
+            # Normalize inputs
+            inputs = normalize(inputs)
 
             with autocast(), torch.autograd.detect_anomaly(check_nan=True):
                 predicted = model(inputs)
+                # print(predicted)
                 loss = criterion(*predicted, labels)
 
             scaler.scale(loss).backward()
+            scaler.unscale_(optimizer)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             scaler.step(optimizer)
             scaler.update()
 

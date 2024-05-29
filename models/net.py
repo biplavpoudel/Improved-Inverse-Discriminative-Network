@@ -19,15 +19,13 @@ class net(nn.Module):
             nn.Linear(256, 256),
             nn.ReLU(inplace=True),
             nn.Linear(256, 1),
-            nn.Sigmoid()
+            # nn.Sigmoid()
         )
-        
 
     def forward(self, inputs):
 
         reference, reference_inverse, test, test_inverse = self.module(inputs)
         reference, reference_inverse = self.stream(reference, reference_inverse)
-        test, test_inverse = self.stream(test, test_inverse)
 
         cat_1 = torch.cat((test, reference_inverse), dim=1)
         cat_2 = torch.cat((reference, test), dim=1)
@@ -51,8 +49,8 @@ class net(nn.Module):
 
 if __name__ == '__main__':
     net = net().cuda()
-    input = torch.randn(1, 2, 115, 220)
+    input = torch.randn(1, 2, 115, 220).cuda()
     print("The model summary is: ")
-    summary(model=net, input_size=(2, 115, 220), batch_size=1, device="cuda")
-    # out_1, out_2, out_3 = net(input)
-    # print(out_1, out_2, out_3)
+    # summary(model=net, input_size=(2, 115, 220), batch_size=1, device="cuda")
+    out_1, out_2, out_3 = net(input)
+    print(out_1, out_2, out_3)
