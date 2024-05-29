@@ -26,6 +26,7 @@ class net(nn.Module):
 
         reference, reference_inverse, test, test_inverse = self.module(inputs)
         reference, reference_inverse = self.stream(reference, reference_inverse)
+        test, test_inverse = self.stream(test, test_inverse)
 
         cat_1 = torch.cat((test, reference_inverse), dim=1)
         cat_2 = torch.cat((reference, test), dim=1)
